@@ -19,6 +19,7 @@
       --shadow:0 10px 30px rgba(0,0,0,.08);
     }
     *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
     html,body{margin:0;background:var(--paper);color:var(--ink);font-family:'Lato',system-ui,Arial,sans-serif}
     a{color:var(--brand);text-decoration:none}
     .container{width:min(1150px, 92vw);margin-inline:auto}
@@ -27,10 +28,12 @@
     .btn.primary:hover{filter:brightness(.95)}
     .btn.ghost{color:var(--brand);background:transparent}
     .btn.ghost:hover{background:rgba(219,24,24,.08)}
+    .btn.white{background:#fff;color:var(--brand);border-color:#fff}
+    .btn.white:hover{background:rgba(255,255,255,.9)}
     header{position:sticky;top:0;background:rgba(255,255,255,.9);backdrop-filter:saturate(1.2) blur(6px);border-bottom:1px solid #eee;z-index:50}
-    .nav{display:flex;align-items:center;justify-content:space-between;padding:.9rem 0}
+    .nav{display:flex;align-items:center;justify-content:space-between;padding:1rem 0}
     .brand{display:flex;align-items:center;gap:.8rem;font-weight:900;letter-spacing:.3px}
-    .brand-mark{width:42px;height:42px;border-radius:50%;background:var(--brand);display:grid;place-items:center;color:#fff;font-weight:900;box-shadow:var(--shadow)}
+    .brand-logo{height:90px;width:auto;object-fit:contain}
     .nav a{font-weight:700;margin-left:1.2rem}
     /* Hero */
     .hero{padding:clamp(2rem, 4vw, 4rem) 0;background:linear-gradient(180deg, var(--tint), #fff)}
@@ -45,9 +48,15 @@
     .row{display:flex;gap:.8rem;flex-wrap:wrap}
 
     /* Trust bar */
-    .trust{padding:1.2rem 0;border-top:1px solid #f1ecec;border-bottom:1px solid #f1ecec;background:#fff}
-    .trust ul{display:flex;gap:1.6rem;flex-wrap:wrap;list-style:none;padding:0;margin:0}
-    .trust li{font-weight:700;color:#7a6f6f}
+    .trust{padding:2.5rem 0;background:linear-gradient(135deg, #ffffff, #fafafa)}
+    .trust-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.2rem}
+    .trust-card{background:linear-gradient(135deg, #fff, #fcfcfc);border:1px solid #f0f0f0;border-radius:16px;padding:1.5rem 1rem;position:relative;overflow:hidden;transition:all .3s ease}
+    .trust-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg, var(--brand), #ff6b6b);opacity:0;transition:.3s ease}
+    .trust-card:hover{transform:translateY(-5px);box-shadow:0 10px 30px rgba(0,0,0,.1);border-color:#e0e0e0}
+    .trust-card:hover::before{opacity:1}
+    .trust-number{font-size:2.5rem;font-weight:900;background:linear-gradient(135deg, var(--brand), #ff6b6b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:.5rem;line-height:1}
+    .trust-card h4{margin:0;font-size:.9rem;font-weight:600;color:var(--ink);line-height:1.3}
+    .trust-card p{margin:.5rem 0 0;font-size:.85rem;color:#666;line-height:1.4}
 
     /* Feature blocks */
     .section{padding:clamp(2rem, 5vw, 4rem) 0}
@@ -60,7 +69,9 @@
     /* Roadmap */
     .roadmap{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem}
     .phase{border-left:6px solid var(--brand);padding:1rem;background:#fff;border-radius:12px;border-top:1px solid #eee;border-right:1px solid #eee;border-bottom:1px solid #eee}
-    .phase h4{margin:.1rem 0 .4rem}
+    .phase h4{margin:.1rem 0 .6rem;color:var(--brand)}
+    .phase-timeline{font-weight:600;color:var(--brand-dark);font-size:.9rem;margin-bottom:.3rem}
+    .phase-content{color:#666;font-size:.95rem;line-height:1.4}
     .muted{opacity:.75}
 
     /* Profession list */
@@ -78,8 +89,14 @@
 
     @media (max-width:930px){
       .hero-grid{grid-template-columns:1fr}
-      .grid-3{grid-template-columns:1fr}
+      .grid-3{grid-template-columns:1fr 1fr}
       .roadmap{grid-template-columns:1fr 1fr}
+      .trust-grid{grid-template-columns:1fr 1fr}
+    }
+    @media (max-width:480px){
+      .grid-3{grid-template-columns:1fr}
+      .roadmap{grid-template-columns:1fr}
+      .trust-grid{grid-template-columns:1fr}
     }
   </style>
 </head>
@@ -87,8 +104,8 @@
   <header>
     <div class="container nav" role="navigation" aria-label="Main">
       <div class="brand" aria-label="Immigrant Networks">
-        <div class="brand-mark" aria-hidden="true">IN</div>
-        <span>Immigrant Networks</span>
+        <!-- Replace 'your-logo.jpg' with your actual logo image path -->
+        <img src="logo.jpg" alt="Immigrant Networks" class="brand-logo" />
       </div>
       <nav>
         <a href="#features">Features</a>
@@ -103,27 +120,41 @@
   <section class="hero">
     <div class="container hero-grid">
       <div>
-        <span class="pill">🇨🇦 Profession + Province specific</span>
-        <h1>Career Pathways — Your Roadmap to a Canadian Career</h1>
+        <h1>Career Pathways – Your Roadmap to a Canadian Career</h1>
         <p class="lead">A guided, step‑by‑step pathway that helps newcomers navigate credential recognition, licensing, skill bridging, and job strategies — tailored to <strong>your profession</strong> and <strong>your province</strong>.</p>
         <div class="row" style="margin-top:1.1rem">
-          <a class="btn primary" href="#pricing">Get Started</a>
-          <a class="btn ghost" href="#demo">See a Sample Pathway</a>
+          <a class="btn primary" href="https://buy.stripe.com/cNi4gz1b9bGw4NXa0o4ko03">Get Started</a>
+          <!-- Replace 'sample-pathway.pdf' with your actual PDF file path -->
+          <a class="btn ghost" href="sample-pathway.pdf" target="_blank">See a Sample Pathway</a>
         </div>
-        <p class="muted" style="margin-top:.8rem">Updated quarterly • Built by Immigrant Networks • Integrates with Rezume.ca & AIInterviewCoach.ca</p>
       </div>
-
-      </div>
+    </div>
   </section>
 
   <section class="trust">
     <div class="container">
-      <ul>
-        <li>✔ 15+ regulated professions covered</li>
-        <li>✔ Federal + Provincial steps combined</li>
-        <li>✔ Financial roadmap & hidden costs</li>
-        <li>✔ AI tools & live coaching</li>
-      </ul>
+      <div class="trust-grid">
+        <div class="trust-card">
+          <div class="trust-number">15+</div>
+          <h4>Regulated Professions</h4>
+          <p>Comprehensive coverage across all major fields</p>
+        </div>
+        <div class="trust-card">
+          <div class="trust-number">2 in 1</div>
+          <h4>Federal + Provincial</h4>
+          <p>All requirements combined in one pathway</p>
+        </div>
+        <div class="trust-card">
+          <div class="trust-number">100%</div>
+          <h4>Financial Transparency</h4>
+          <p>Complete roadmap with all costs revealed</p>
+        </div>
+        <div class="trust-card">
+          <div class="trust-number">24/7</div>
+          <h4>AI-Powered Support</h4>
+          <p>Smart tools plus live coaching sessions</p>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -152,12 +183,12 @@
           <p>Targeted prompts, skills match analysis, best cities to work, and alternative career options.</p>
         </article>
         <article class="card">
-          <div class="icon">📄</div>
+          <div class="icon">🔄</div>
           <h3>Integrated Tools</h3>
           <p>Seamless with Rezume.ca (resume & cover letters) and AIInterviewCoach.ca (mock interviews).</p>
         </article>
         <article class="card">
-          <div class="icon">🔁</div>
+          <div class="icon">🔍</div>
           <h3>Quarterly Updates</h3>
           <p>We track changes from regulators and programs so your roadmap stays current.</p>
         </article>
@@ -170,23 +201,43 @@
       <h2>4‑Phase Licensing & Readiness Roadmap</h2>
       <div class="roadmap">
         <div class="phase">
-          <h4>Phase 1 • Initial Assessment</h4>
-          <p class="muted">Month 1–2 • Credential review, document prep, eligibility checks.</p>
+          <h4>Phase 1: Initial Assessment</h4>
+          <div class="phase-timeline">Month 1–2</div>
+          <div class="phase-content">
+            • Credential review<br>
+            • Document prep<br>
+            • Eligibility checks
+          </div>
         </div>
         <div class="phase">
-          <h4>Phase 2 • Exams & Evaluations</h4>
-          <p class="muted">Month 2–12 • Exams, competency reviews, language & knowledge tests.</p>
+          <h4>Phase 2: Exams & Evaluations</h4>
+          <div class="phase-timeline">Month 2–12</div>
+          <div class="phase-content">
+            • Professional exams<br>
+            • Competency reviews<br>
+            • Language & knowledge tests
+          </div>
         </div>
         <div class="phase">
-          <h4>Phase 3 • Bridge Training</h4>
-          <p class="muted">Month 3–24 • Courses, supervised practice, mentorship, upgrading.</p>
+          <h4>Phase 3: Bridge Training</h4>
+          <div class="phase-timeline">Month 3–24</div>
+          <div class="phase-content">
+            • Required courses<br>
+            • Supervised practice<br>
+            • Mentorship & upgrading
+          </div>
         </div>
         <div class="phase">
-          <h4>Phase 4 • Licensing & Registration</h4>
-          <p class="muted">Ongoing • Final paperwork, fees, and CPD requirements.</p>
+          <h4>Phase 4: Licensing & Registration</h4>
+          <div class="phase-timeline">Ongoing</div>
+          <div class="phase-content">
+            • Final paperwork<br>
+            • Registration fees<br>
+            • CPD requirements
+          </div>
         </div>
       </div>
-      <p class="muted" style="margin-top:1rem">Includes a financial roadmap with typical fees and hidden costs to budget for.</p>
+      
     </div>
   </section>
 
@@ -215,21 +266,26 @@
   <section id="pricing" class="section" style="background:var(--tint)">
     <div class="container">
       <h2>Pricing</h2>
-      <div class="card" style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
-        <div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:2rem">
+        <div class="card">
           <h3>Career Pathways (Standalone)</h3>
           <p class="muted">Full pathway PDF + quarterly updates + cohort access.</p>
-          <p><strong>Contact us for organizational pricing</strong></p>
+          <div style="margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid #eee">
+            <p style="font-size:1.1rem;font-weight:600;color:var(--brand)">Contact us for organizational pricing</p>
+          </div>
         </div>
-        <div>
+        <div class="card">
           <h3>Newcomer Success Bundle</h3>
           <p class="muted">Career Pathways + Rezume.ca + AIInterviewCoach.ca</p>
-          <p><strong>Special partner rates available</strong></p>
+          <div style="margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid #eee">
+            <p style="font-size:1.1rem;font-weight:600;color:var(--brand)">Special partner rates available</p>
+          </div>
         </div>
       </div>
-      <div class="row" style="margin-top:1rem">
-        <a class="btn primary" href="#form">Talk to Sales</a>
-        <a class="btn ghost" href="#demo">Download Sample</a>
+      <div class="row" style="margin-top:2rem;justify-content:center">
+        <a class="btn primary" href="https://buy.stripe.com/cNi4gz1b9bGw4NXa0o4ko03">Get Started</a>
+        <!-- Replace 'sample-pathway.pdf' with your actual PDF file path -->
+        <a class="btn ghost" href="sample-pathway.pdf" target="_blank">Download Sample</a>
       </div>
     </div>
   </section>
@@ -241,8 +297,7 @@
         <p style="margin:.2rem 0;opacity:.9">Get a profession‑specific pathway for your province — with a clear 90‑day plan.</p>
       </div>
       <div class="row">
-        <a class="btn primary" href="#form">Request Access</a>
-        <a class="btn ghost" href="#features">See Features</a>
+        <a class="btn white" href="https://buy.stripe.com/cNi4gz1b9bGw4NXa0o4ko03">Get Started</a>
       </div>
     </div>
   </section>
@@ -253,14 +308,14 @@
       <div class="grid-3" style="grid-template-columns:1fr 1fr 1fr">
         <details class="card"><summary>Is this only for regulated professions?</summary><p>We support both regulated and unregulated professions. Regulated paths include licensing and exams; unregulated paths focus on skill‑mapping and job strategies.</p></details>
         <details class="card"><summary>How often is the content updated?</summary><p>Quarterly. We monitor changes from federal/provincial regulators and bridging programs.</p></details>
-        <details class="card"><summary>Do I get live support?</summary><p>Yes. Cohorts include office hours and access to Immigrant Networks’ coaching & networking community.</p></details>
+        <details class="card"><summary>Do I get live support?</summary><p>Yes. Cohorts include office hours and access to Immigrant Networks' coaching & networking community.</p></details>
       </div>
     </div>
   </section>
 
   <footer>
     <div class="container" style="text-align:center">
-      <p>A Product of Immigrant Networks · <a href="https://www.immigrantnetworks.com" target="_blank" rel="noreferrer noopener">www.immigrantnetworks.com</a> · partnerships@immigrantnetworks.com</p>
+      <p>A Product of Immigrant Networks · <a href="https://www.immigrantnetworks.com" target="_blank" rel="noreferrer noopener">www.immigrantnetworks.com</a> · info@immnet.ca</p>
       <p class="muted">© <span id="year"></span> Immigrant Networks. All rights reserved.</p>
     </div>
   </footer>
