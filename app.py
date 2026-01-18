@@ -249,7 +249,18 @@ def process_with_claude(job_id, data):
         )
         
         # Extract the response
+        # Extract the response
         result = message.content[0].text
+
+        # Strip markdown code blocks if present
+        result = result.strip()
+        if result.startswith('```json'):
+            result = result[7:]  # Remove ```json
+        if result.startswith('```'):
+            result = result[3:]  # Remove ```
+        if result.endswith('```'):
+            result = result[:-3]  # Remove trailing ```
+        result = result.strip()
         
         # Store the result in Redis
         save_job(job_id, {
