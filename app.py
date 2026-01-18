@@ -241,7 +241,7 @@ def process_with_claude(job_id, data):
         
         # Call Claude API
         message = client.messages.create(
-            model="claude-opus-4-5-20250514",  
+            model="claude-opus-4-5-20251101",  
             max_tokens=8000,
             messages=[
                 {"role": "user", "content": prompt}
