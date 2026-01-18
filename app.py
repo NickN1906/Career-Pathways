@@ -1,14 +1,24 @@
 import os
 import uuid
+import json
 import threading
 import anthropic
+import redis
 from flask import Flask, request, jsonify
 from datetime import datetime
 
 app = Flask(__name__)
 
-# In-memory storage for job results (use Redis in production for persistence)
-jobs = {}
+# Redis connection (Heroku sets REDIS_URL automatically when you add Redis addon)
+redis_url = os.environ.get('REDIS_URL', 'redis://localhost:6379')
+# Handle Heroku's redis:// vs rediss:// (SSL) URL
+if redis_url.startswith('rediss://'):
+    redis_client = redis.from_url(redis_url, ssl_cert_reqs=None)
+else:
+    redis_client = redis.from_url(redis_url)
+
+# Job expiry time (24 hours in seconds)
+JOB_EXPIRY = 86400
 
 # Initialize Anthropic client
 client = anthropic.Anthropic(api_key=os.environ.get('ANTHROPIC_API_KEY'))
@@ -192,6 +202,23 @@ The JSON object must follow this exact schema, with its content adapted dynamica
 CRITICAL NOTE - Make sure to split each sentence in bullet points under various headings, Paragraphs are strictly not allowed. Each sentence should be splitted into bullet points."""
 
 
+def save_job(job_id, data):
+    """Save job data to Redis with expiry"""
+    redis_client.setex(
+        f"job:{job_id}",
+        JOB_EXPIRY,
+        json.dumps(data)
+    )
+
+
+def get_job(job_id):
+    """Get job data from Redis"""
+    data = redis_client.get(f"job:{job_id}")
+    if data:
+        return json.loads(data)
+    return None
+
+
 def process_with_claude(job_id, data):
     """Background function to process the prompt with Claude"""
     try:
@@ -224,19 +251,19 @@ def process_with_claude(job_id, data):
         # Extract the response
         result = message.content[0].text
         
-        # Store the result
-        jobs[job_id] = {
+        # Store the result in Redis
+        save_job(job_id, {
             'status': 'completed',
             'result': result,
             'completed_at': datetime.utcnow().isoformat()
-        }
+        })
         
     except Exception as e:
-        jobs[job_id] = {
+        save_job(job_id, {
             'status': 'error',
             'error': str(e),
             'completed_at': datetime.utcnow().isoformat()
-        }
+        })
 
 
 @app.route('/submit', methods=['POST'])
@@ -250,11 +277,11 @@ def submit_job():
     # Generate unique job ID
     job_id = str(uuid.uuid4())
     
-    # Store initial job status
-    jobs[job_id] = {
+    # Store initial job status in Redis
+    save_job(job_id, {
         'status': 'processing',
         'created_at': datetime.utcnow().isoformat()
-    }
+    })
     
     # Start background processing
     thread = threading.Thread(target=process_with_claude, args=(job_id, data))
@@ -273,13 +300,13 @@ def get_result(job_id):
     """
     Returns the result for a given job_id
     """
-    if job_id not in jobs:
+    job = get_job(job_id)
+    
+    if job is None:
         return jsonify({
             'status': 'not_found',
-            'error': 'Job ID not found'
+            'error': 'Job ID not found or expired'
         }), 404
-    
-    job = jobs[job_id]
     
     if job['status'] == 'processing':
         return jsonify({
@@ -293,7 +320,18 @@ def get_result(job_id):
 @app.route('/health', methods=['GET'])
 def health_check():
     """Health check endpoint"""
-    return jsonify({'status': 'healthy', 'timestamp': datetime.utcnow().isoformat()})
+    try:
+        # Test Redis connection
+        redis_client.ping()
+        redis_status = 'connected'
+    except Exception as e:
+        redis_status = f'error: {str(e)}'
+    
+    return jsonify({
+        'status': 'healthy',
+        'redis': redis_status,
+        'timestamp': datetime.utcnow().isoformat()
+    })
 
 
 if __name__ == '__main__':
